@@ -18,7 +18,7 @@ export default function SendNotificationsPage() {
 
   const handleSend = () => {
     console.log(`Sent notification to ${recipient}: ${subject} - ${message}`);
-    // Here you would typically send this data to your backend
+    // Aquí típicamente enviarías estos datos a tu backend
   };
 
   return (

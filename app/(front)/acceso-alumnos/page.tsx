@@ -5,17 +5,19 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useAuth } from '@clerk/nextjs';
 
 export default function Login() {
   const [loginData, setLoginData] = useState({ email: '', password: '' });
   const router = useRouter();
+  const { userId } = useAuth();
 
   const handleLoginChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setLoginData(prevData => ({ ...prevData, [name]: value }));
   };
 
-  const handleLoginSubmit = (e: React.FormEvent) => {
+  const handleLoginSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     console.log('Login submitted:', loginData);
     // Here you would typically send the login data to your backend

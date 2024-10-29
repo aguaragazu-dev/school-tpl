@@ -1,8 +1,6 @@
 'use client';
 import React, { useState } from 'react';
-import { usePathname } from 'next/navigation';
-
-import SideMenu from './components/SideMenu';
+import { useUser } from '@clerk/nextjs';
 import TopMenu from './components/TopMenu';
 import DashboardHome from './page';
 import UsersPage from './list/users/page';
@@ -14,23 +12,39 @@ import SendNotificationsPage from './send-notifications/page';
 import IssueInvoicesPage from './issue-invoices/page';
 import NewsPage from '@/app/(front)/noticias/page';
 import StudentEnrollmentsPages from './list/students/page';
+import { usePathname } from 'next/navigation';
+import PagesAdmin from './pages/page';
+import SettingsPage from './settings/page';
+import SideMenuAdmin from './components/SideMenu';
 
 export default function AdminDashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { isLoaded, isSignedIn, user } = useUser();
+  // const userRole = user?.role;
+  const userRole = 'admin';
   const pathname = usePathname();
+
+  if (!isLoaded || !isSignedIn) {
+    return null; // or redirect to login
+  }
+
   const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
 
   const renderContent = () => {
     switch (pathname) {
-      case '/admin/users':
+      case '/admin/list/users':
         return <UsersPage />;
-      case '/admin/news':
+      case '/admin/settings':
+        return <SettingsPage />;
+      case '/admin/pages':
+        return <PagesAdmin />;
+      case '/admin/list/news':
         return <NewsPage />;
-      case '/admin/events':
+      case '/admin/list/events':
         return <EventsPage />;
-      case '/admin/enrollments':
+      case '/admin/list/students':
         return <StudentEnrollmentsPages />;
-      case '/admin/admissions':
+      case '/admin/list/teachers':
         return <TeacherAdmissionsPage />;
       case '/admin/assign-courses':
         return <AssignCoursesPage />;
@@ -47,7 +61,7 @@ export default function AdminDashboard() {
 
   return (
     <div className="flex h-screen bg-gray-100">
-      <SideMenu isOpen={sidebarOpen} onClose={toggleSidebar} />
+      <SideMenuAdmin isOpen={sidebarOpen} onClose={toggleSidebar} userRole={userRole} />
       <div className="flex-1 flex flex-col overflow-hidden">
         <TopMenu onMenuToggle={toggleSidebar} />
         <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100">

@@ -1,22 +1,40 @@
+'use client';
+
 import React from 'react';
-import { Bell, Menu } from 'lucide-react';
+import { useUser } from '@clerk/nextjs';
+import { Button } from '@/components/ui/button';
+import { Sun, Moon } from 'lucide-react';
+import { useState } from 'react';
 
 type TopMenuProps = {
   onMenuToggle: () => void;
 };
 
 export default function TopMenu({ onMenuToggle }: TopMenuProps) {
+  const { user } = useUser();
+  const [isDarkMode, setIsDarkMode] = useState(false);
+
+  const toggleDarkMode = () => {
+    setIsDarkMode(!isDarkMode);
+    document.body.classList.toggle('dark', !isDarkMode);
+  };
+
   return (
-    <header className="bg-white shadow-sm">
-      <div className="flex items-center justify-between p-4">
-        <button onClick={onMenuToggle} className="lg:hidden">
-          <Menu size={24} />
-        </button>
-        <h1 className="text-2xl font-semibold">Dashboard</h1>
-        <button className="p-2 rounded-full bg-gray-200">
-          <Bell size={20} />
-        </button>
+    <div className="flex items-center justify-between p-4 bg-white shadow">
+      <Button onClick={onMenuToggle}>
+        Menu
+      </Button>
+      <div className="flex items-center">
+        <Button onClick={toggleDarkMode} className="mr-4">
+          {isDarkMode ? <Sun /> : <Moon />}
+        </Button>
+        {user && (
+          <div className="flex items-center">
+            <img src={user.imageUrl} alt={user.fullName || 'avatar'} className="w-8 h-8 rounded-full mr-2" />
+            <span>{user.firstName}</span>
+          </div>
+        ) }
       </div>
-    </header>
+    </div>
   );
 }

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import NavItem from './NavItem';
 import {
   Home,
@@ -9,14 +9,56 @@ import {
   DollarSign,
   Bell,
   FileArchive,
+  Settings,
 } from 'lucide-react';
 
 type SideMenuProps = {
   isOpen: boolean;
   onClose: () => void;
+  userRole: string; 
 };
 
-export default function SideMenuAdmin({ isOpen, onClose }: SideMenuProps) {
+const menuConfig = [
+  {
+    section: 'Administración',
+    icon: <Settings size={20} />,
+    visible: ["admin"], 
+    items: [
+      { icon: <Home size={20} />, text: 'Dashboard', href: '/admin', visible: ["admin", "teacher", "student"] },
+      { icon: <Users size={20} />, text: 'Usuarios', href: '/admin/list/users', visible: ["admin"] },
+      { icon: <FileText size={20} />, text: 'Páginas', href: '/admin/pages', visible: ["admin", "teacher"] },
+    ],
+  },
+  {
+    section: 'Gestión Académica',
+    icon: <BookOpen size={20} />,
+    visible: ["admin", "teacher", "student"], 
+    items: [
+      { icon: <Calendar size={20} />, text: 'Eventos', href: '/admin/list/events', visible: ["admin", "teacher", "student"] },
+      { icon: <Users size={20} />, text: 'Matrículas', href: '/admin/list/students', visible: ["admin", "teacher"] },
+      { icon: <Users size={20} />, text: 'Admisiones', href: '/admin/list/teachers', visible: ["admin"] },
+    ],
+  },
+  {
+    section: 'Finanzas',
+    icon: <DollarSign size={20} />,
+    visible: ["admin", "teacher"], 
+    items: [
+      { icon: <Bell size={20} />, text: 'Enviar Notificaciones', href: '/admin/send-notifications', visible: ["admin"] },
+      { icon: <FileArchive size={20} />, text: 'Emitir Cuotas', href: '/admin/issue-invoices', visible: ["admin"] },
+    ],
+  },
+];
+
+export default function SideMenuAdmin({ isOpen, onClose, userRole }: SideMenuProps) {
+  const [openSections, setOpenSections] = useState<string[]>([]);
+
+  const toggleSection = (section: string) => {
+    setOpenSections((prev) =>
+      prev.includes(section) ? prev.filter((s) => s !== section) : [...prev, section]
+    );
+  };
+
   return (
     <aside
       className={`${
@@ -43,52 +85,28 @@ export default function SideMenuAdmin({ isOpen, onClose }: SideMenuProps) {
         </button>
       </div>
       <nav className="mt-8">
-        <NavItem icon={<Home size={20} />} text="Dashboard" href="/admin" />
-        <NavItem
-          icon={<Users size={20} />}
-          text="Usuarios"
-          href="/admin/list/users"
-        />
-        <NavItem
-          icon={<FileText size={20} />}
-          text="Noticias"
-          href="/admin/list/news"
-        />
-        <NavItem
-          icon={<Calendar size={20} />}
-          text="Eventos"
-          href="/admin/list/events"
-        />
-        <NavItem
-          icon={<Users size={20} />}
-          text="Matrículas"
-          href="/admin/enrollments"
-        />
-        <NavItem
-          icon={<Users size={20} />}
-          text="Admisiones"
-          href="/admin/admissions"
-        />
-        <NavItem
-          icon={<BookOpen size={20} />}
-          text="Asignar Materias"
-          href="/admin/assign-courses"
-        />
-        <NavItem
-          icon={<DollarSign size={20} />}
-          text="Actualizar Haberes"
-          href="/admin/update-salaries"
-        />
-        <NavItem
-          icon={<Bell size={20} />}
-          text="Enviar Notificaciones"
-          href="/admin/send-notifications"
-        />
-        <NavItem
-          icon={<FileArchive size={20} />}
-          text="Emitir Cuotas"
-          href="/admin/issue-invoices"
-        />
+        {menuConfig.map((section) => (
+          section.visible.includes(userRole) && (
+            <div key={section.section}>
+              <div
+                className="flex items-center cursor-pointer"
+                onClick={() => toggleSection(section.section)}
+              >
+                {section.icon}
+                <span className="ml-2">{section.section}</span>
+              </div>
+              {openSections.includes(section.section) && (
+                <div className="ml-4">
+                  {section.items.map((item) => (
+                    item.visible.includes(userRole) && (
+                      <NavItem key={item.text} icon={item.icon} text={item.text} href={item.href} />
+                    )
+                  ))}
+                </div>
+              )}
+            </div>
+          )
+        ))}
       </nav>
     </aside>
   );

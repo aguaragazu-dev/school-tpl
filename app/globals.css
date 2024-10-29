@@ -71,3 +71,19 @@
     @apply bg-background text-foreground;
   }
 }
+
+.bg-blue-700 {
+  background-color: #1e3a8a; /* Dark theme */
+}
+
+.text-white {
+  color: #ffffff; /* Dark theme */
+}
+
+.light .bg-blue-700 {
+  background-color: #ffffff; /* Light theme */
+}
+
+.light .text-white {
+  color: #000000; /* Light theme */
+}

@@ -1,6 +1,6 @@
 'use client';
 import React, { useState } from 'react';
-import { usePathname } from 'next/navigation';
+import { useUser } from '@clerk/nextjs';
 
 import SideMenu from './components/SideMenu';
 import DashboardHome from './page';
@@ -9,11 +9,16 @@ import StudentsPage from './students/page';
 import AttendancePage from './attendance/page';
 import GradesPage from './grades/page';
 import SalaryPage from './salary/page';
-import Header from '@/components/Header';
+import { usePathname } from 'next/navigation';
 
 export default function TeacherDashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { isLoaded, isSignedIn } = useUser();
   const pathname = usePathname();
+  
+  if (!isLoaded || !isSignedIn) {
+    return null; // or redirect to login
+  }
 
   const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
 

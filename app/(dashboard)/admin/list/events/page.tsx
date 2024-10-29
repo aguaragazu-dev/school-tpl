@@ -2,14 +2,14 @@
 import React, { useState } from 'react';
 import CrudTable from '@/components/CrudTable';
 
-type Event = {
+type Item = {
   id: number;
   name: string;
   date: string;
   location: string;
 };
 
-const initialEvents: Event[] = [
+const initialEvents: Item[] = [
   {
     id: 1,
     name: 'Annual Sports Day',
@@ -26,16 +26,16 @@ const initialEvents: Event[] = [
 ];
 
 export default function EventsPage() {
-  const [events, setEvents] = useState<Event[]>(initialEvents);
+  const [events, setEvents] = useState<Item[]>(initialEvents);
 
   const handleAdd = () => {
     // Implement add logic
     console.log('Add event');
   };
 
-  const handleEdit = (event: Event) => {
+  const handleEdit = (item: Item) => {
     // Implement edit logic
-    console.log('Edit event', event);
+    console.log('Edit event', item);
   };
 
   const handleDelete = (id: number) => {

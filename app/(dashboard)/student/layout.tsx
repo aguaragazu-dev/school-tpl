@@ -1,15 +1,21 @@
 'use client';
 import React, { useState } from 'react';
-import { usePathname } from 'next/navigation';
+import { useUser } from '@clerk/nextjs';
 
 import SideMenu from './components/SideMenu';
 import DashboardHome from './page';
 import CoursesPage from './courses/page';
 import NotificationsPage from './notifications/page';
+import { usePathname } from 'next/navigation';
 
 export default function StudentDashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const pathname = usePathname();
+  const { isLoaded, isSignedIn } = useUser();
+
+  if (!isLoaded || !isSignedIn) {
+    return null; // or redirect to login
+  }
 
   const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
 
