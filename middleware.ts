@@ -1,6 +1,7 @@
 
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
+import { asyncLocalStorage } from './lib/context'
 
 const isProtectedRoute = createRouteMatcher([
   "/api(.*)"
@@ -22,3 +23,17 @@ export const config = {
     '/(api|trpc)(.*)',
   ],
 };
+
+export function middleware(request: NextRequest) {
+  const context = {
+    ip: request.ip,
+    userAgent: request.headers.get('user-agent'),
+    path: request.nextUrl.pathname,
+    method: request.method,
+    headers: Object.fromEntries(request.headers)
+  }
+
+  return asyncLocalStorage.run(context, () => {
+    return NextResponse.next()
+  })
+}

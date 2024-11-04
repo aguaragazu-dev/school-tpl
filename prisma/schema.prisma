@@ -1,50 +1,803 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
-  output   = "../node_modules/.prisma/client"
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = env("DATABASE_URL")
+  provider = "mysql"
+  url      = "mysql://root:password@172.19.0.3:3306/ns_santarita?connection_limit=5"
+}
+
+// Enums centralizados
+enum Role {
+  STUDENT
+  PARENT
+  TEACHER
+  ADMIN
+}
+
+enum FamilyRole {
+  PARENT
+  STUDENT
+}
+
+enum NewsStatus {
+  PUBLISHED
+  DRAFT
+  HIDDEN
+  PENDING
+  REJECTED
+}
+
+model EducationLevel {
+  id        Int       @id @default(autoincrement())
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  name          String                      @unique
+  news          News[]
+  events        Event[]
+  users         User[]
+  notifications Notification[]
+  courses       Course[]
+  subjects      Subject[]
+  institutions  InstitutionEducationLevel[]
+
+  @@index([deletedAt])
+  @@map("education_levels")
+}
+
+model Category {
+  id        Int       @id @default(autoincrement())
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  name String
+  slug String @unique
+  news News[]
+  events Event[]
+  faqs Faq[]
+
+  @@index([deletedAt])
+  @@map("categories")
+}
+
+model News {
+  id        Int       @id @default(autoincrement())
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  title            String
+  slug             String          @unique
+  category         Category        @relation(fields: [categoryId], references: [id])
+  categoryId       Int             @map("category_id")
+  content          String          @db.Text
+  excerpt          String?         @db.Text
+  image            String?         @map("image_url")
+  isPrivate        Boolean         @default(false) @map("is_private")
+  isFeatured       Boolean         @default(false) @map("is_featured")
+  status           NewsStatus      @default(PUBLISHED) @map("status")
+  educationLevel   EducationLevel? @relation(fields: [educationLevelId], references: [id])
+  educationLevelId Int?            @map("education_level_id")
+  author           User?           @relation(fields: [authorId], references: [id])
+  authorId         Int?            @map("author_id")
+
+  @@index([deletedAt])
+  @@index([educationLevelId])
+  @@map("news")
+}
+
+model Event {
+  id        Int       @id @default(autoincrement())
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  title            String
+  slug             String          @unique
+  category         Category        @relation(fields: [categoryId], references: [id])
+  categoryId       Int             @map("category_id")
+  description      String          @db.Text
+  eventDate        DateTime        @map("event_date")
+  time             String          @map("time")
+  place            String          @map("place")
+  isPrivate        Boolean         @default(false) @map("is_private")
+  isFeatured       Boolean         @default(false) @map("is_featured")
+  status           NewsStatus      @default(PUBLISHED) @map("status")
+  image            String?         @map("image_url")
+  email            String?         @map("email")
+  phone            String?         @map("phone")
+  address          String?         @map("address")
+  organizator     String?         @map("organizator")
+  link             String?         @map("link")
+  educationLevel   EducationLevel? @relation(fields: [educationLevelId], references: [id])
+  educationLevelId Int?            @map("education_level_id")
+
+  @@index([deletedAt])
+  @@index([eventDate])
+  @@index([educationLevelId])
+  @@map("events")
+}
+
+model Faq {
+  id        Int       @id @default(autoincrement())
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  question String
+  answer   String
+  category Category  @relation(fields: [categoryId], references: [id])
+  categoryId Int     @map("category_id")
+  isActive  Boolean  @default(true) @map("is_active")
+  isPrivate Boolean  @default(false) @map("is_private")
+  isFeatured Boolean  @default(false) @map("is_featured")
+
+  @@index([deletedAt])
+  @@map("faqs")
 }
 
 model User {
-  id            String    @id @default(cuid())
-  name          String?
-  email         String?   @unique
-  emailVerified DateTime?
-  image         String?
-  password      String?
-  role          String      @default("STUDENT")
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  id        Int       @id @default(autoincrement())
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  username         String          @unique
+  email            String          @unique
+  password         String
+  role             Role            @default(STUDENT)
+  isActive         Boolean         @default(true) @map("is_active")
+  educationLevel   EducationLevel? @relation(fields: [educationLevelId], references: [id])
+  educationLevelId Int?            @map("education_level_id")
+  family           Family?         @relation(fields: [familyId], references: [id])
+  familyId         Int?            @map("family_id")
+
+  // Relaciones
+  sentNotifications     Notification[]     @relation("SenderNotifications")
+  receivedNotifications Notification[]     @relation("RecipientNotifications")
+  courseEnrollments     CourseEnrollment[]
+  teacherSubjects       TeacherSubject[]
+  studentSubjects       StudentSubject[]
+  evaluations           Evaluation[]
+  grades                Grade[]
+  attendance            Attendance[]
+  conductReports        Conduct[]          @relation("StudentConduct")
+  teacherConducts       Conduct[]          @relation("TeacherConduct")
+  fees                  Fee[]
+  examPermits           ExamPermit[]
+  studyMaterials        StudyMaterial[]
+  teacherRecord         TeacherRecord?
+  payrolls              Payroll[]
+  replacements          Replacement[]
+  absences              TeacherAbsence[]
+  positions             TeacherPosition[]
+  examRecords           ExamRecord[]
+  familyMembers         FamilyMember[]
+  profile               UserProfile?
+  errorLogs             ErrorLog[]
+  auditLogs             AuditLog[]
+  activityLogs          ActivityLog[]
+  news                  News[]
+
+  @@index([deletedAt])
+  @@index([email])
+  @@index([role])
+  @@index([educationLevelId])
+  @@index([familyId])
+  @@map("users")
 }
 
-model VerificationToken {
-  identifier String
-  token      String   @unique
-  expires    DateTime
+model UserProfile {
+  id        Int       @id @default(autoincrement())
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
 
-  @@unique([identifier, token])
+  user   User @relation(fields: [userId], references: [id])
+  userId Int  @unique @map("user_id")
+
+  firstName   String    @map("first_name")
+  lastName    String    @map("last_name")
+  dateOfBirth DateTime? @map("date_of_birth")
+  gender      String?
+  address     String?   @db.Text
+  phoneNumber String?   @map("phone_number")
+  avatar      String?
+  bio         String?   @db.Text
+
+  // Campos adicionales que podrían ser útiles
+  nationality      String?
+  bloodType        String? @map("blood_type")
+  emergencyContact String? @map("emergency_contact")
+  allergies        String? @db.Text
+
+  // Campos específicos para estudiantes/profesores
+  enrollmentDate DateTime? @map("enrollment_date")
+  graduationDate DateTime? @map("graduation_date")
+  status         String? // active, inactive, graduated, etc.
+
+  @@index([deletedAt])
+  @@map("user_profiles")
 }
 
-model School {
-  id        String   @id @default(cuid())
+model Course {
+  id               Int                @id @default(autoincrement())
+  name             String
+  code             String             @unique // Añadido código único del curso
+  description      String?            @db.Text
+  educationLevel   EducationLevel     @relation(fields: [educationLevelId], references: [id])
+  educationLevelId Int                @map("education_level_id")
+  institution      Institute        @relation(fields: [instituteId], references: [id])
+  instituteId    Int                @map("institute_id")
+  enrollments      CourseEnrollment[]
+  startDate        DateTime           @map("start_date")
+  endDate          DateTime           @map("end_date")
+  maxStudents      Int                @default(30) @map("max_students")
+  isActive         Boolean            @default(true) @map("is_active")
+  cohort           String?            @map("cohort")
+  period           String?            @map("period")
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  @@index([educationLevelId])
+  @@index([instituteId])
+  @@index([isActive])
+  @@map("courses")
+}
+
+model CourseEnrollment {
+  id         Int      @id @default(autoincrement())
+  user       User     @relation(fields: [userId], references: [id])
+  userId     Int      @map("user_id")
+  course     Course   @relation(fields: [courseId], references: [id])
+  courseId   Int      @map("course_id")
+  status     String   @default("ACTIVE") // ACTIVE, SUSPENDED, COMPLETED
+  enrolledAt DateTime @default(now()) @map("enrolled_at")
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  @@unique([userId, courseId])
+  @@index([status])
+  @@map("course_enrollments")
+}
+
+model Notification {
+  id               Int             @id @default(autoincrement())
+  title            String
+  message          String          @db.Text
+  sender           User            @relation("SenderNotifications", fields: [senderId], references: [id])
+  senderId         Int             @map("sender_id")
+  recipient        User            @relation("RecipientNotifications", fields: [recipientId], references: [id])
+  recipientId      Int             @map("recipient_id")
+  educationLevel   EducationLevel? @relation(fields: [educationLevelId], references: [id])
+  educationLevelId Int?            @map("education_level_id")
+  isPersonal       Boolean         @default(false) @map("is_personal")
+  isRead           Boolean         @default(false) @map("is_read")
+  readAt           DateTime?       @map("read_at")
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  @@index([senderId])
+  @@index([recipientId])
+  @@index([isRead])
+  @@map("notifications")
+}
+
+// materia de estudios
+model Subject {
+  id               Int              @id @default(autoincrement())
+  name             String
+  code             String           @unique
+  description      String?          @db.Text
+  educationLevel   EducationLevel   @relation(fields: [educationLevelId], references: [id])
+  educationLevelId Int              @map("education_level_id")
+  teacherSubjects  TeacherSubject[]
+  studentSubjects  StudentSubject[]
+  evaluations      Evaluation[]
+  examPermits      ExamPermit[]
+  replacements     Replacement[]
+  exams            Exam[]
+  credits          Int              @default(1)
+  isActive         Boolean          @default(true) @map("is_active")
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  @@index([educationLevelId])
+  @@index([isActive])
+  @@map("subjects")
+}
+
+model TeacherSubject {
+  id        Int       @id @default(autoincrement())
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  teacher   User    @relation(fields: [teacherId], references: [id])
+  teacherId Int     @map("teacher_id")
+  subject   Subject @relation(fields: [subjectId], references: [id])
+  subjectId Int     @map("subject_id")
+
+  @@index([deletedAt])
+  @@index([teacherId])
+  @@index([subjectId])
+  @@map("teacher_subjects")
+}
+
+model StudentSubject {
+  id        Int       @id @default(autoincrement())
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  student   User    @relation(fields: [studentId], references: [id])
+  studentId Int     @map("student_id")
+  subject   Subject @relation(fields: [subjectId], references: [id])
+  subjectId Int     @map("subject_id")
+
+  @@index([deletedAt])
+  @@index([studentId])
+  @@index([subjectId])
+  @@map("student_subjects")
+}
+
+model EvaluationPeriod {
+  id        Int       @id @default(autoincrement())
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  name        String
+  startDate   DateTime     @map("start_date")
+  endDate     DateTime     @map("end_date")
+  evaluations Evaluation[]
+  conducts    Conduct[]
+
+  @@index([deletedAt])
+  @@map("evaluation_periods")
+}
+
+model Evaluation {
+  id        Int       @id @default(autoincrement())
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  subject     Subject          @relation(fields: [subjectId], references: [id])
+  subjectId   Int              @map("subject_id")
+  period      EvaluationPeriod @relation(fields: [periodId], references: [id])
+  periodId    Int              @map("period_id")
+  teacher     User             @relation(fields: [teacherId], references: [id])
+  teacherId   Int              @map("teacher_id")
+  title       String
+  description String?
+  grades      Grade[]
+
+  @@index([deletedAt])
+  @@index([subjectId])
+  @@index([periodId])
+  @@index([teacherId])
+  @@map("evaluations")
+}
+
+model Grade {
+  id        Int       @id @default(autoincrement())
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  evaluation   Evaluation @relation(fields: [evaluationId], references: [id])
+  evaluationId Int        @map("evaluation_id")
+  student      User       @relation(fields: [studentId], references: [id])
+  studentId    Int        @map("student_id")
+  grade        Decimal    @db.Decimal(5, 2)
+
+  @@index([deletedAt])
+  @@index([evaluationId])
+  @@index([studentId])
+  @@map("grades")
+}
+
+model Attendance {
+  id        Int       @id @default(autoincrement())
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  student   User     @relation(fields: [studentId], references: [id])
+  studentId Int      @map("student_id")
+  date      DateTime
+  isPresent Boolean  @map("is_present")
+
+  @@index([deletedAt])
+  @@index([studentId])
+  @@index([date])
+  @@map("attendance")
+}
+
+model Conduct {
+  id        Int       @id @default(autoincrement())
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  student     User             @relation("StudentConduct", fields: [studentId], references: [id])
+  studentId   Int              @map("student_id")
+  period      EvaluationPeriod @relation(fields: [periodId], references: [id])
+  periodId    Int              @map("period_id")
+  teacher     User             @relation("TeacherConduct", fields: [teacherId], references: [id])
+  teacherId   Int              @map("teacher_id")
+  conduct     String?
+  observation String?
+
+  @@index([deletedAt])
+  @@index([studentId])
+  @@index([periodId])
+  @@index([teacherId])
+  @@map("conduct")
+}
+
+model Fee {
+  id        Int       @id @default(autoincrement())
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  student   User      @relation(fields: [studentId], references: [id])
+  studentId Int       @map("student_id")
+  amount    Decimal   @db.Decimal(10, 2)
+  dueDate   DateTime  @map("due_date")
+  isPaid    Boolean   @default(false) @map("is_paid")
+  paidDate  DateTime? @map("paid_date")
+
+  @@index([deletedAt])
+  @@index([studentId])
+  @@index([dueDate])
+  @@map("fees")
+}
+
+model ExamPermit {
+  id        Int       @id @default(autoincrement())
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  student    User     @relation(fields: [studentId], references: [id])
+  studentId  Int      @map("student_id")
+  subject    Subject  @relation(fields: [subjectId], references: [id])
+  subjectId  Int      @map("subject_id")
+  permitDate DateTime @map("permit_date")
+  isUsed     Boolean  @default(false) @map("is_used")
+
+  @@index([deletedAt])
+  @@index([studentId])
+  @@index([subjectId])
+  @@map("exam_permits")
+}
+
+model StudyMaterial {
+  id        Int       @id @default(autoincrement())
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  student      User     @relation(fields: [studentId], references: [id])
+  studentId    Int      @map("student_id")
+  materialName String   @map("material_name")
+  purchaseDate DateTime @map("purchase_date")
+  isReceived   Boolean  @default(false) @map("is_received")
+
+  @@index([deletedAt])
+  @@index([studentId])
+  @@map("study_materials")
+}
+
+model TeacherRecord {
+  id        Int       @id @default(autoincrement())
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  teacher           User    @relation(fields: [teacherId], references: [id])
+  teacherId         Int     @unique @map("teacher_id")
+  personalInfo      String? @map("personal_info") @db.Text
+  employmentHistory String? @map("employment_history") @db.Text
+
+  @@index([deletedAt])
+  @@index([teacherId])
+  @@map("teacher_records")
+}
+
+model Payroll {
+  id        Int       @id @default(autoincrement())
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  teacher   User     @relation(fields: [teacherId], references: [id])
+  teacherId Int      @map("teacher_id")
+  payDate   DateTime @map("pay_date")
+  amount    Decimal  @db.Decimal(10, 2)
+  details   String?  @db.Text
+
+  @@index([deletedAt])
+  @@index([teacherId])
+  @@index([payDate])
+  @@map("payrolls")
+}
+
+model Replacement {
+  id        Int       @id @default(autoincrement())
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  teacher   User      @relation(fields: [teacherId], references: [id])
+  teacherId Int       @map("teacher_id")
+  subject   Subject   @relation(fields: [subjectId], references: [id])
+  subjectId Int       @map("subject_id")
+  startDate DateTime  @map("start_date")
+  endDate   DateTime? @map("end_date")
+
+  @@index([deletedAt])
+  @@index([teacherId])
+  @@index([subjectId])
+  @@map("replacements")
+}
+
+model TeacherAbsence {
+  id        Int       @id @default(autoincrement())
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  teacher     User     @relation(fields: [teacherId], references: [id])
+  teacherId   Int      @map("teacher_id")
+  absenceDate DateTime @map("absence_date")
+  reason      String?  @db.Text
+
+  @@index([deletedAt])
+  @@index([teacherId])
+  @@index([absenceDate])
+  @@map("teacher_absences")
+}
+
+model TeacherPosition {
+  id        Int       @id @default(autoincrement())
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  teacher      User      @relation(fields: [teacherId], references: [id])
+  teacherId    Int       @map("teacher_id")
+  positionName String    @map("position_name")
+  startDate    DateTime  @map("start_date")
+  endDate      DateTime? @map("end_date")
+
+  @@index([deletedAt])
+  @@index([teacherId])
+  @@map("teacher_positions")
+}
+
+model ExamSession {
+  id        Int       @id @default(autoincrement())
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
   name      String
-  logo      String?
-  email     String?
-  phone     String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  startDate DateTime @map("start_date")
+  endDate   DateTime @map("end_date")
+  exams     Exam[]
+
+  @@index([deletedAt])
+  @@map("exam_sessions")
 }
 
-model Page {
-  id        String   @id @default(cuid())
-  title     String
-  content   String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+model Exam {
+  id        Int       @id @default(autoincrement())
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  subject       Subject      @relation(fields: [subjectId], references: [id])
+  subjectId     Int          @map("subject_id")
+  examSession   ExamSession  @relation(fields: [examSessionId], references: [id])
+  examSessionId Int          @map("exam_session_id")
+  examDate      DateTime     @map("exam_date")
+  description   String?      @db.Text
+  examRecords   ExamRecord[]
+
+  @@index([deletedAt])
+  @@index([subjectId])
+  @@index([examSessionId])
+  @@map("exams")
+}
+
+model ExamRecord {
+  id        Int       @id @default(autoincrement())
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  exam         Exam     @relation(fields: [examId], references: [id])
+  examId       Int      @map("exam_id")
+  student      User     @relation(fields: [studentId], references: [id])
+  studentId    Int      @map("student_id")
+  writtenGrade Decimal? @map("written_grade") @db.Decimal(5, 2)
+  oralGrade    Decimal? @map("oral_grade") @db.Decimal(5, 2)
+  finalGrade   Decimal? @map("final_grade") @db.Decimal(5, 2)
+
+  @@index([deletedAt])
+  @@index([examId])
+  @@index([studentId])
+  @@map("exam_records")
+}
+
+model Family {
+  id        Int       @id @default(autoincrement())
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  familyName    String         @map("family_name")
+  users         User[]
+  familyMembers FamilyMember[]
+
+  @@index([deletedAt])
+  @@map("families")
+}
+
+model FamilyMember {
+  id        Int       @id @default(autoincrement())
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  family   Family     @relation(fields: [familyId], references: [id])
+  familyId Int        @map("family_id")
+  user     User       @relation(fields: [userId], references: [id])
+  userId   Int        @map("user_id")
+  role     FamilyRole
+
+  @@index([deletedAt])
+  @@index([familyId])
+  @@index([userId])
+  @@map("family_members")
+}
+
+model Institute {
+  id        Int       @id @default(autoincrement())
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  name            String
+  address         String?                     @db.Text
+  email           String?                     @map("email")
+  phone           String?                     @map("phone")
+  description     String?                     @db.Text
+  logo            String?                     @map("logo_url")
+  contactInfo     String?                     @map("contact_info") @db.Text
+  educationLevels InstitutionEducationLevel[]
+
+  curses Course[]
+
+  @@index([deletedAt])
+  @@map("institutions")
+}
+
+model InstitutionEducationLevel {
+  id        Int       @id @default(autoincrement())
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  institution      Institute    @relation(fields: [instituteId], references: [id])
+  instituteId    Int            @map("institute_id")
+  educationLevel   EducationLevel @relation(fields: [educationLevelId], references: [id])
+  educationLevelId Int            @map("education_level_id")
+
+  @@index([deletedAt])
+  @@index([instituteId])
+  @@index([educationLevelId])
+  @@map("institution_education_levels")
+}
+
+// Los modelos de configuración y logs también necesitan sus propios campos base
+model SystemConfig {
+  id        Int       @id @default(autoincrement())
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  key         String  @unique
+  value       String  @db.Text
+  type        String
+  group       String
+  description String? @db.Text
+  isPublic    Boolean @default(false) @map("is_public")
+
+  @@index([deletedAt])
+  @@index([group])
+  @@map("system_config")
+}
+
+model AuditLog {
+  id        Int       @id @default(autoincrement())
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  action     String
+  entityType String  @map("entity_type")
+  entityId   String  @map("entity_id")
+  userId     Int?    @map("user_id")
+  user       User?   @relation(fields: [userId], references: [id])
+  oldData    Json?   @map("old_data")
+  newData    Json?   @map("new_data")
+  ipAddress  String? @map("ip_address")
+  userAgent  String? @map("user_agent")
+
+  @@index([deletedAt])
+  @@index([action])
+  @@index([entityType])
+  @@index([userId])
+  @@index([createdAt])
+  @@map("audit_logs")
+}
+
+model ErrorLog {
+  id        Int       @id @default(autoincrement())
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  level     String
+  message   String  @db.Text
+  stack     String? @db.Text
+  userId    Int?    @map("user_id")
+  user      User?   @relation(fields: [userId], references: [id])
+  path      String?
+  method    String?
+  params    Json?
+  headers   Json?
+  ipAddress String? @map("ip_address")
+
+  @@index([deletedAt])
+  @@index([level])
+  @@index([userId])
+  @@index([createdAt])
+  @@map("error_logs")
+}
+
+model ActivityLog {
+  id        Int       @id @default(autoincrement())
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  userId      Int     @map("user_id")
+  user        User    @relation(fields: [userId], references: [id])
+  action      String
+  description String  @db.Text
+  metadata    Json?
+  ipAddress   String? @map("ip_address")
+
+  @@index([deletedAt])
+  @@index([userId])
+  @@index([action])
+  @@index([createdAt])
+  @@map("activity_logs")
 }
