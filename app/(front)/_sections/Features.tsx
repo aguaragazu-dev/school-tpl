@@ -3,17 +3,17 @@ import { ThumbsUp, BookOpen, Users } from 'lucide-react';
 const features = [
   {
     icon: <ThumbsUp className="w-12 h-12 text-red-500" />,
-    title: 'POPULAR COURSES',
+    title: 'JPI N° 1455 - Jardín',
     description: 'Lorem ipsum dolor sit, amet consectetur elit.',
   },
   {
     icon: <BookOpen className="w-12 h-12 text-purple-500" />,
-    title: 'MODERN LIBRARY',
+    title: 'EPI N° 1341 - Primario',
     description: 'Lorem ipsum dolor sit, amet consectetur elit.',
   },
   {
     icon: <Users className="w-12 h-12 text-blue-500" />,
-    title: 'QUALIFIED TEACHER',
+    title: 'EESOPI N° 3106 - Secundario',
     description: 'Lorem ipsum dolor sit, amet consectetur elit.',
   },
 ];

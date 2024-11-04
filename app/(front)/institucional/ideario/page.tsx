@@ -1,8 +1,17 @@
+import PageHeader from '@/components/PageHeader';
 import { Card, CardContent } from '@/components/ui/card';
 
 export default function IdearioPage() {
   return (
     <div className="container mx-auto px-4 py-8">
+      <PageHeader
+        title="IDEARIO"
+        breadcrumb={[
+          { label: "Home", href: "/" },
+          { label: "Ideario Institucional", href: "/institucional/ideario" },
+        ]}
+        backgroundImage="/placeholder.svg?height=400&width=1200"
+      />
       <h1 className="text-3xl font-bold mb-6">Ideario Institucional</h1>
       <Card>
         <CardContent className="prose max-w-none">

@@ -65,32 +65,29 @@ export default function Header() {
                 <div className="flex items-center space-x-4">
                   <span className="flex items-center">
                     <Phone size={16} className="mr-1" />
-                    795 South Park Avenue, CA 94107
+                    Florencio Fernandez 5440, SF, ARG
                   </span>
-                  <span>Have Questions</span>
+                  <span>¿Alguna Pregunta?</span>
                 </div>
                 <div className="flex items-center space-x-4">
-                  <Link href="#" className="hover:text-green-400">
+                  <Link href="#" className="hover:text-blue-400">
                     <Facebook size={16} />
                   </Link>
-                  <Link href="#" className="hover:text-green-400">
+                  <Link href="#" className="hover:text-blue-400">
                     <Twitter size={16} />
                   </Link>
-                  <Link href="#" className="hover:text-green-400">
+                  <Link href="#" className="hover:text-blue-400">
                     <Linkedin size={16} />
                   </Link>
-                  <Link href="#" className="hover:text-green-400">
+                  <Link href="#" className="hover:text-blue-400">
                     <Instagram size={16} />
                   </Link>
-                  <select className="bg-transparent border-none text-sm">
-                    <option value="en">English</option>
-                    <option value="es">Español</option>
-                  </select>
-                  <Link href="/login" className="hover:text-green-400">
-                    Log In
+                  
+                  <Link href="/sign-in" className="hover:text-blue-400">
+                    Ingresar
                   </Link>
-                  <Link href="/register" className="hover:text-green-400">
-                    Register
+                  <Link href="/sign-up" className="hover:text-blue-400">
+                    Registrarse
                   </Link>
                 </div>
               </div>
@@ -102,28 +99,28 @@ export default function Header() {
             <div className="container mx-auto px-4 flex justify-between items-center">
             <Link href="/" className="flex items-center space-x-2">
             <School size={32} />
-            <span className="text-xl font-bold">Colegio Ejemplo</span>
+            <span className="text-xl font-bold">Comunidad Santa Rita de Casia</span>
           </Link>
               <div className="flex items-center space-x-8">
                 <div className="flex items-center">
-                  <Phone size={24} className="text-green-500 mr-2" />
+                  <Phone size={24} className="text-blue-500 mr-2" />
                   <div>
-                    <p className="text-sm">Call Us Now</p>
-                    <p className="font-bold">(908) 875 7678</p>
+                    <p className="text-sm">Contactenos</p>
+                    <p className="font-bold">(342) 875 7678</p>
                   </div>
                 </div>
                 <div className="flex items-center">
-                  <Mail size={24} className="text-green-500 mr-2" />
+                  <Mail size={24} className="text-blue-500 mr-2" />
                   <div>
-                    <p className="text-sm">Enquery Us</p>
-                    <p className="font-bold">enquery@edulyn.com</p>
+                    <p className="text-sm">Consultas</p>
+                    <p className="font-bold">consultas@santaritadecasia.edu.ar</p>
                   </div>
                 </div>
                 <Link
                   href="/apply"
-                  className="bg-green-500 text-white px-6 py-2 rounded  hover:bg-green-600 transition duration-300"
+                  className="bg-blue-500 text-white px-6 py-2 rounded  hover:bg-blue-600 transition duration-300"
                 >
-                  APPLY NOW
+                  Reemplazos
                 </Link>
               </div>
             </div>
@@ -132,13 +129,13 @@ export default function Header() {
       )}
 
       {/* Navigation */}
-      <nav className={`${isScrolled ? 'py-4' : 'bg-green-500 py-0'}`}>
+      <nav className={`${isScrolled ? 'py-4' : 'bg-blue-500 py-0'}`}>
         <div className="container mx-auto px-4">
           <div className="flex justify-between items-center">
             {isScrolled && (
               <Link href="/" className="flex items-center space-x-2">
               <School size={32} />
-              <span className="text-xl font-bold">Colegio Ejemplo</span>
+              <span className="text-xl font-bold">Comunidad Santa Rita de Casia</span>
             </Link>
             )}
             <ul className="flex space-x-6 py-4">
@@ -147,7 +144,7 @@ export default function Header() {
                   href="/"
                   className={`${
                     isScrolled ? 'text-navy-blue' : 'text-white'
-                  } hover:text-green-400 flex items-center`}
+                  } hover:text-blue-400 flex items-center`}
                 >
                   Inicio 
                 </Link>
@@ -158,15 +155,18 @@ export default function Header() {
                 <DropdownMenu >
                   <DropdownMenuTrigger className={`${
                     isScrolled ? 'text-navy-blue' : 'text-white'
-                  } hover:text-green-400 flex items-center`}>
+                  } hover:text-blue-400 flex items-center`}>
                     Institucional <ChevronDown size={16} className="ml-1" />
                   </DropdownMenuTrigger>
                   <DropdownMenuContent>
                     <DropdownMenuItem>
-                      <Link href="/institucional/ideario">Ideario</Link>
+                      <Link href="/contacto">Contacto</Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem>
                       <Link href="/institucional/historia">Historia</Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem>
+                      <Link href="/institucional/santarita">Santa Rita</Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem>
                       <Link href="/institucional/galeria">Galería</Link>
@@ -197,7 +197,7 @@ export default function Header() {
                   href="/eventos"
                   className={`${
                     isScrolled ? 'text-navy-blue' : 'text-white'
-                  } hover:text-green-400 flex items-center`}
+                  } hover:text-blue-400 flex items-center`}
                 >
                   Eventos
                 </Link>
@@ -207,7 +207,7 @@ export default function Header() {
                   href="/noticias"
                   className={`${
                     isScrolled ? 'text-navy-blue' : 'text-white'
-                  } hover:text-green-400 flex items-center`}
+                  } hover:text-blue-400 flex items-center`}
                 >
                   Noticias
                 </Link>
@@ -218,7 +218,7 @@ export default function Header() {
                 aria-label="Search"
                 className={`${
                   isScrolled ? 'text-navy-blue' : 'text-white'
-                } hover:text-green-400`}
+                } hover:text-blue-400`}
               >
                 <Search size={20} />
               </button>
@@ -226,14 +226,14 @@ export default function Header() {
                 aria-label="Cart"
                 className={`${
                   isScrolled ? 'text-navy-blue' : 'text-white'
-                } hover:text-green-400`}
+                } hover:text-blue-400`}
               >
                 <ShoppingCart size={20} />
               </button> */}
               {isScrolled && (
                 <Link
                   href="/acceso-alumnos"
-                  className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition duration-300"
+                  className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-300"
                 >
                   Acceso Alumnos
                 </Link>
@@ -243,7 +243,7 @@ export default function Header() {
                 onClick={toggleMenu}
                 className={`${
                   isScrolled ? 'text-navy-blue' : 'text-white'
-                } hover:text-green-400 md:hidden`}
+                } hover:text-blue-400 md:hidden`}
               >
                 {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
               </button>

@@ -46,10 +46,10 @@ export default function EventCard({
           <p className="text-gray-600 mb-4">{description}</p>
         </div>
         <div className="flex flex-col items-end justify-between">
-          <div className="text-2xl font-bold text-green-500">{date}</div>
+          <div className="text-2xl font-bold text-blue-500">{date}</div>
           <Link
             href={`/eventos/${id}`}
-            className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition duration-300"
+            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-300"
           >
             JOIN NOW
           </Link>

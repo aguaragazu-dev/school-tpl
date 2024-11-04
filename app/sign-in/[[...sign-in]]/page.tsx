@@ -7,6 +7,7 @@ export default function SignInPage() {
   const router = useRouter();
 
   const handleSignInSuccess = () => {
+    
     router.push('/dashboard');
   };
 

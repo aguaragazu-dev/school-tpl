@@ -52,8 +52,8 @@ export default function BlogPosts() {
   return (
     <div className="container mx-auto px-4 py-12">
       <h2 className="text-3xl font-bold text-center mb-8">
-        Lets See What We Can Show To You Our <br />
-        <span className="text-navy-blue">Useful Blog Article Post.</span>
+        Las novedades de la comunidad <br />
+        <span className="text-navy-blue">Ultimas noticias</span>
       </h2>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
         {blogPosts.map((post) => (

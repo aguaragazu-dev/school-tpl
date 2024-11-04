@@ -31,7 +31,7 @@ export default function Events() {
   return (
     <div className="w-full max-w-2xl">
       <h2 className="text-3xl font-bold mb-6">
-        UPCOMING <span className="text-green-500">EVENTS</span>
+        PROXIMOS <span className="text-green-500">EVENTOS</span>
       </h2>
       <div className="space-y-6">
         {events.map((event) => (

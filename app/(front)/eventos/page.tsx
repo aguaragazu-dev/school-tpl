@@ -6,10 +6,10 @@ export default function EventsPage() {
   return (
     <div>
       <PageHeader
-        title="EVENTS"
+        title="EVENTOS"
         breadcrumb={[
           { label: 'Home', href: '/' },
-          { label: 'Events', href: '/events' },
+          { label: 'Eventos', href: '/eventos' },
         ]}
         backgroundImage="/placeholder.svg?height=400&width=1200"
       />

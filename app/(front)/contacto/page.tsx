@@ -6,6 +6,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import Link from 'next/link';
+import PageHeader from '@/components/PageHeader';
+import { MapPin, Phone, AtSign, FileEditIcon } from 'lucide-react';
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
@@ -31,9 +33,17 @@ export default function ContactPage() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-6">Contacto</h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+    <div className="container mx-auto px-4 ">
+      <PageHeader
+        title="CONTACTO"
+        breadcrumb={[
+          { label: "Home", href: "/" },
+          { label: "Contacto", href: "/contacto" },
+        ]}
+        backgroundImage="/placeholder.svg?height=400&width=1200"
+      />
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-5 mb-8">
         <Card>
           <CardHeader>
             <CardTitle>Formulario de Contacto</CardTitle>
@@ -114,13 +124,13 @@ export default function ContactPage() {
             </CardHeader>
             <CardContent>
               <p>
-                <strong>Dirección:</strong> Av. Ejemplo 1234, Buenos Aires
+                <strong><MapPin  size={20} className="mr-2" />Dirección:</strong> Av. Florencio Fernandez 5440, Santa Fe
               </p>
               <p>
-                <strong>Teléfono:</strong> (011) 1234-5678
+                <strong><Phone size={20} className="mr-2" /> Teléfono:</strong> (342) 489-7474
               </p>
               <p>
-                <strong>Email:</strong> info@nsguadalupe.edu.ar
+                <strong><AtSign size={20} className="mr-2" />Email:</strong> info@santaritadecasia.edu.ar
               </p>
             </CardContent>
           </Card>
@@ -135,7 +145,7 @@ export default function ContactPage() {
                     href="/contacto/matriculacion"
                     className="text-blue-600 hover:underline"
                   >
-                    Formulario de Matriculación de Alumnos
+                    <FileEditIcon /> Formulario de Matriculación de Alumnos
                   </Link>
                 </li>
                 <li>
@@ -143,7 +153,7 @@ export default function ContactPage() {
                     href="/contacto/admision-docentes"
                     className="text-blue-600 hover:underline"
                   >
-                    Formulario de Admisión de Docentes
+                    <FileEditIcon /> Formulario de Admisión de Docentes
                   </Link>
                 </li>
               </ul>

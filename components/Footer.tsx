@@ -7,9 +7,9 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div>
             <h3 className="text-lg font-semibold mb-4">Contacto</h3>
-            <p>Dirección: Av. Ejemplo 1234, Buenos Aires</p>
-            <p>Teléfono: (011) 1234-5678</p>
-            <p>Email: info@nsguadalupe.edu.ar</p>
+            <p>Dirección: Av. Florencio Fernandez 5440, Santa Fe</p>
+            <p>Teléfono: (342) 489-7474</p>
+            <p>Email: info@santaritadecasia.edu.ar</p>
           </div>
           <div>
             <h3 className="text-lg font-semibold mb-4">Enlaces Rápidos</h3>
@@ -30,7 +30,7 @@ export default function Footer() {
           </div>
         </div>
         <div className="mt-8 text-center">
-          <p>&copy; 2023 Colegio Nuestra Señora de Guadalupe. Todos los derechos reservados.</p>
+          <p>&copy; 2023 Comunidad Educativa Santa Rita de Casia. Todos los derechos reservados.</p>
         </div>
       </div>
     </footer>

@@ -33,7 +33,7 @@ export default function FAQ() {
   return (
     <div className="w-full max-w-2xl">
       <h2 className="text-3xl font-bold mb-6">
-        FREQUENTLY ASK <span className="text-green-500">QUESTION</span>
+        <span className="text-green-500">PREGUNTAS</span> Y RESPUESTAS FRECUENTES
       </h2>
       <div className="space-y-4">
         {faqs.map((faq) => (
