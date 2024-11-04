@@ -1,0 +1,14 @@
+services:
+
+  frontend:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+      args:
+        USER_ID: ${USER_ID:-1000}
+        GROUP_ID: ${GROUP_ID:-1000}
+    container_name: limpi-front
+    restart: unless-stopped
+    environment:
+      - ENVIRONMENT=${ENV:-production}
+      - NODE_ENV=production
