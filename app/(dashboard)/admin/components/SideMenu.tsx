@@ -1,113 +1,166 @@
+'use client';
+
 import React, { useState } from 'react';
-import NavItem from './NavItem';
+import Link from 'next/link';
+import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import {
-  Home,
-  Users,
-  FileText,
-  Calendar,
-  BookOpen,
-  DollarSign,
-  Bell,
-  FileArchive,
-  Settings,
-} from 'lucide-react';
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from '@/components/ui/collapsible';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+  TooltipProvider,
+} from '@/components/ui/tooltip';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { MenuSection, MenuItem, UserRole } from '../config/routes';
 
-type SideMenuProps = {
-  isOpen: boolean;
-  onClose: () => void;
-  userRole: string; 
-};
+interface SideMenuProps {
+  isCollapsed: boolean;
+  toggleSidebar: () => void;
+  userRole: UserRole;
+  currentPath: string;
+  menuConfig: MenuSection[];
+}
 
-const menuConfig = [
-  {
-    section: 'Administración',
-    icon: <Settings size={20} />,
-    visible: ["admin"], 
-    items: [
-      { icon: <Home size={20} />, text: 'Dashboard', href: '/admin', visible: ["admin", "teacher", "student"] },
-      { icon: <Users size={20} />, text: 'Usuarios', href: '/admin/list/users', visible: ["admin"] },
-      { icon: <FileText size={20} />, text: 'Páginas', href: '/admin/pages', visible: ["admin", "teacher"] },
-    ],
-  },
-  {
-    section: 'Gestión Académica',
-    icon: <BookOpen size={20} />,
-    visible: ["admin", "teacher", "student"], 
-    items: [
-      { icon: <Calendar size={20} />, text: 'Eventos', href: '/admin/list/events', visible: ["admin", "teacher", "student"] },
-      { icon: <Users size={20} />, text: 'Matrículas', href: '/admin/list/students', visible: ["admin", "teacher"] },
-      { icon: <Users size={20} />, text: 'Admisiones', href: '/admin/list/teachers', visible: ["admin"] },
-    ],
-  },
-  {
-    section: 'Finanzas',
-    icon: <DollarSign size={20} />,
-    visible: ["admin", "teacher"], 
-    items: [
-      { icon: <Bell size={20} />, text: 'Enviar Notificaciones', href: '/admin/send-notifications', visible: ["admin"] },
-      { icon: <FileArchive size={20} />, text: 'Emitir Cuotas', href: '/admin/issue-invoices', visible: ["admin"] },
-    ],
-  },
-];
-
-export default function SideMenuAdmin({ isOpen, onClose, userRole }: SideMenuProps) {
+export default function SideMenu({
+  isCollapsed,
+  toggleSidebar,
+  userRole,
+  currentPath,
+  menuConfig,
+}: SideMenuProps) {
   const [openSections, setOpenSections] = useState<string[]>([]);
 
   const toggleSection = (section: string) => {
     setOpenSections((prev) =>
-      prev.includes(section) ? prev.filter((s) => s !== section) : [...prev, section]
+      prev.includes(section)
+        ? prev.filter((s) => s !== section)
+        : [...prev, section]
+    );
+  };
+
+  const isVisible = (roles?: UserRole[]) => {
+    if (!roles) return true;
+    return roles.includes(userRole);
+  };
+
+  const renderMenuItem = (item: MenuItem, depth: number = 0) => {
+    if (!isVisible(item.visible)) return null;
+
+    const isActive = currentPath === item.path;
+    const hasChildren = item.children && item.children.length > 0;
+    const Icon = item.icon;
+
+    return (
+      <div key={item.path} className="w-full">
+        <Link href={item.path}>
+          <Button
+            variant={isActive ? 'secondary' : 'ghost'}
+            className={cn(
+              'w-full justify-start',
+              isCollapsed ? 'justify-center' : `pl-${(depth + 1) * 4}`
+            )}
+          >
+            {Icon && (
+              <Icon
+                className={cn('h-4 w-4', !isCollapsed && 'mr-2')}
+              />
+            )}
+            {!isCollapsed && (
+              <>
+                <span>{item.label}</span>
+                {hasChildren && (
+                  <ChevronRight
+                    className={cn(
+                      'ml-auto h-4 w-4 transition-transform',
+                      openSections.includes(item.path) && 'rotate-90'
+                    )}
+                  />
+                )}
+              </>
+            )}
+          </Button>
+        </Link>
+        {hasChildren && !isCollapsed && (
+          <Collapsible
+            open={openSections.includes(item.path)}
+            onOpenChange={() => toggleSection(item.path)}
+          >
+            <CollapsibleContent className="pl-4">
+              {item.children?.map((child) => renderMenuItem(child, depth + 1))}
+            </CollapsibleContent>
+          </Collapsible>
+        )}
+      </div>
     );
   };
 
   return (
-    <aside
-      className={`${
-        isOpen ? 'translate-x-0' : '-translate-x-full'
-      } fixed inset-y-0 left-0 z-50 w-64 bg-blue-700 text-white transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0`}
+    <div
+      className={cn(
+        'relative border-r border-gray-200 dark:border-gray-800 h-full bg-white dark:bg-gray-950 transition-all duration-300',
+        isCollapsed ? 'w-16' : 'w-64'
+      )}
     >
-      <div className="flex items-center justify-between p-4">
-        <span className="text-2xl font-semibold">Escuela Admin</span>
-        <button onClick={onClose} className="lg:hidden">
-          <svg
-            className="w-6 h-6"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M6 18L18 6M6 6l12 12"
-            />
-          </svg>
-        </button>
+      <div className="flex h-14 items-center justify-between px-4 border-b border-gray-200 dark:border-gray-800">
+        {!isCollapsed && <span className="text-lg font-bold">Santa Rita</span>}
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={toggleSidebar}
+          className="h-8 w-8"
+        >
+          <ChevronLeft
+            className={cn(
+              'h-4 w-4 transition-transform',
+              isCollapsed && 'rotate-180'
+            )}
+          />
+        </Button>
       </div>
-      <nav className="mt-8">
-        {menuConfig.map((section) => (
-          section.visible.includes(userRole) && (
-            <div key={section.section}>
-              <div
-                className="flex items-center cursor-pointer"
-                onClick={() => toggleSection(section.section)}
-              >
-                {section.icon}
-                <span className="ml-2">{section.section}</span>
+
+      <ScrollArea className="h-[calc(100vh-3.5rem)]">
+        <div className="space-y-2 p-2">
+          {menuConfig
+            .filter((section) => isVisible(section.visible))
+            .map((section) => (
+              <div key={section.title} className="space-y-2">
+                {!isCollapsed && (
+                  <div
+                    className="flex items-center px-2 py-1.5 text-sm font-semibold text-gray-500 dark:text-gray-400"
+                    onClick={() => toggleSection(section.title)}
+                  >
+                    {section.icon && (
+                      <section.icon className="mr-2 h-4 w-4" />
+                    )}
+                    <span>{section.title}</span>
+                    <ChevronRight
+                      className={cn(
+                        'ml-auto h-4 w-4 transition-transform',
+                        openSections.includes(section.title) && 'rotate-90'
+                      )}
+                    />
+                  </div>
+                )}
+                <Collapsible
+                  open={isCollapsed || openSections.includes(section.title)}
+                  onOpenChange={() => toggleSection(section.title)}
+                >
+                  <CollapsibleContent className="space-y-1">
+                    {section.items
+                      .filter((item) => isVisible(item.visible))
+                      .map((item) => renderMenuItem(item))}
+                  </CollapsibleContent>
+                </Collapsible>
               </div>
-              {openSections.includes(section.section) && (
-                <div className="ml-4">
-                  {section.items.map((item) => (
-                    item.visible.includes(userRole) && (
-                      <NavItem key={item.text} icon={item.icon} text={item.text} href={item.href} />
-                    )
-                  ))}
-                </div>
-              )}
-            </div>
-          )
-        ))}
-      </nav>
-    </aside>
+            ))}
+        </div>
+      </ScrollArea>
+    </div>
   );
 }
